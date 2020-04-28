@@ -5,6 +5,8 @@ class Room {
     this.dispatcher = dispatcher;
     this.server = server;
     this.users = new Map();
+
+    this.heartbeat();
   }
 
   serialize () {
@@ -22,6 +24,10 @@ class Room {
       this.sendUpdate();
     });
 
+    client.on('pong', () => {
+      client.stayAlive();
+    });
+
     this.sendUpdate();
   }
 
@@ -31,6 +37,26 @@ class Room {
         room: this.serialize()
       }
     });
+  }
+
+  heartbeat () {
+    setInterval(() => {
+      if (!this.server.clients.length) {
+        return;
+      }
+
+      this.server.clients.forEach(client => {
+        if (!client.isAlive) {
+          client.terminate();
+          this.users.delete(client.user.id);
+
+          return;
+        }
+
+        client.isAlive = false;
+        client.ping(() => {});
+      });
+    }, 3000);
   }
 }
 
