@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "node ./src/server/index.js"
+  },
+  "dependencies": {
+    "uuid": "^7.0.3",
+    "ws": "^7.2.5"
+  }
+}
